@@ -7,7 +7,7 @@ function Carousel() {
   const [x, setX] = useState(0);
   const [offsetX, setOffsetX] = useState(0);
   const widthOfTheSlide = 100;
-  const StandardOfDifference = 50;
+  const standardOfDifference = 50;
 
   const [startX, setStartX] = useState(0);
   const [mouseDown, setMouseDown] = useState(false);
@@ -24,6 +24,8 @@ function Carousel() {
     setOffsetX(0);
   }
 
+
+  // Переключение свайпами
   const handleStartMove = (event) => {
     if (event.type === 'mousedown') {
       setStartX(event.nativeEvent.clientX);
@@ -53,14 +55,28 @@ function Carousel() {
       difference = startX - event.changedTouches[0].clientX;
     }
 
-    if (difference > StandardOfDifference) {
+    if (difference > standardOfDifference) {
       goRight();
-    } else if (difference < -StandardOfDifference) {
+    } else if (difference < -standardOfDifference) {
       goLeft();
     } else {
       setOffsetX(0);
     }
   };
+
+
+  // переключение с клавиатуры
+  function swipeKeyboard(evt) {
+    if (evt.key === 'ArrowRight') goRight();
+    if (evt.key === 'ArrowLeft') goLeft();
+  }
+  React.useEffect(() => {
+    window.addEventListener('keydown', swipeKeyboard);
+
+    return () => {
+      window.removeEventListener('keydown', swipeKeyboard);
+    };
+  });
 
 
   return (
