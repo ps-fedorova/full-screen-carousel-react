@@ -5,12 +5,13 @@ function Carousel() {
   let SliderArr = ['Первый', 'Второй', 'Последний'];
 
   const [x, setX] = useState(0);
+  const [startX, setStartX] = useState(0);
   const [offsetX, setOffsetX] = useState(0);
+
+  const [mouseDown, setMouseDown] = useState(false);
+
   const widthOfTheSlide = 100;
   const standardOfDifference = 50;
-
-  const [startX, setStartX] = useState(0);
-  const [mouseDown, setMouseDown] = useState(false);
 
   function goLeft() {
     x < 0 &&
@@ -23,7 +24,6 @@ function Carousel() {
     setX(x - widthOfTheSlide);
     setOffsetX(0);
   }
-
 
   // Переключение свайпами
   const handleStartMove = (event) => {
@@ -64,12 +64,12 @@ function Carousel() {
     }
   };
 
-
   // переключение с клавиатуры
   function swipeKeyboard(evt) {
     if (evt.key === 'ArrowRight') goRight();
     if (evt.key === 'ArrowLeft') goLeft();
   }
+
   React.useEffect(() => {
     window.addEventListener('keydown', swipeKeyboard);
 
@@ -77,7 +77,6 @@ function Carousel() {
       window.removeEventListener('keydown', swipeKeyboard);
     };
   });
-
 
   return (
     <div className="carousel">
@@ -100,7 +99,8 @@ function Carousel() {
                 <li className="carousel__item" key={index}>
                   {item}
                 </li>
-              )}
+              )
+            }
           )}
       </ul>
 
