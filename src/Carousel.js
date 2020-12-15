@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './Carousel.css';
 
 function Carousel() {
@@ -13,16 +13,49 @@ function Carousel() {
   const widthOfTheSlide = 100;
   const standardOfDifference = 50;
 
+  // Вот эта херня нужна чтобы включать transition только при смене слайда
+  const [timer, setTimer] = useState(0);
+  const [timerGo, setTimerGo] = useState(false);
+
+  const id = useRef(0);
+
+  const TIMER_TIME = 1; // время transition в секундах
+
+  const clear = () => {
+    window.clearInterval(id.current);
+  };
+
+  React.useEffect(() => {
+    id.current = window.setInterval(() => {
+      setTimer((time) => time - 1);
+    }, 1000);
+    return () => clear();
+  }, [timerGo]);
+
+  // чтобы таймер не ушел в минус
+  React.useEffect(() => {
+    if (timer <= 0  || timerGo === false) {
+      clear();
+      setTimerGo(false);
+    }
+  }, [timer, timerGo]);
+  // Эта самая херня для transition до сюда
+
+
   function goLeft() {
     x < 0 &&
     setX(x + widthOfTheSlide);
     setOffsetX(0);
+    setTimerGo(true);
+    setTimer(timer + TIMER_TIME);
   }
 
   function goRight() {
     x > -widthOfTheSlide * (SliderArr.length - 1) &&
     setX(x - widthOfTheSlide);
     setOffsetX(0);
+    setTimerGo(true);
+    setTimer(timer + TIMER_TIME);
   }
 
   // Переключение свайпами
@@ -70,7 +103,7 @@ function Carousel() {
     if (evt.key === 'ArrowLeft') goLeft();
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     window.addEventListener('keydown', swipeKeyboard);
 
     return () => {
@@ -81,7 +114,11 @@ function Carousel() {
   return (
     <div className="carousel">
 
-      <ul className="carousel__list" style={{ transform: `translateX(calc(${x}vw + ${offsetX}px))` }}
+      <ul className="carousel__list"
+          style={{
+            transform: `translateX(calc(${x}vw + ${offsetX}px))`,
+            transition: timerGo ? `all ${TIMER_TIME}s ease 0s` : "",
+          }}
 
           onMouseDown={handleStartMove}
           onMouseMove={handleMove}
@@ -91,7 +128,6 @@ function Carousel() {
           onTouchMove={handleMove}
           onTouchEnd={handleEndMove}
           onMouseOut={handleEndMove}
-
       >
         {
           SliderArr.map((item, index) => {
@@ -103,7 +139,7 @@ function Carousel() {
             }
           )}
       </ul>
-
+      <div style={{marginTop: 20}}>{timer}</div>
       <button className='button button-left' onClick={goLeft}>&larr;</button>
       <button className='button button-right' onClick={goRight}>&rarr;</button>
     </div>

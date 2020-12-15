@@ -13,7 +13,7 @@
   list-style-type: none;
   padding: 0;
   position: absolute;
-  transition: .5s;
+  /*transition: all 0.5s ease 0s;*/
   margin: 0 auto auto 0;
 }
 
