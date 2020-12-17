@@ -1,8 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './Carousel.css';
 
-function Carousel() {
-  let SliderArr = ['Первый', 'Второй', 'Последний'];
+const widthOfTheSlide = 100;
+const standardOfDifference = 50;
+const TIMER_TIME = 1; // transition time in seconds
+const SliderArr = ['Первый', 'Второй', 'Последний'];
+
+const Carousel = () => {
 
   const [x, setX] = useState(0);
   const [startX, setStartX] = useState(0);
@@ -10,55 +14,50 @@ function Carousel() {
 
   const [mouseDown, setMouseDown] = useState(false);
 
-  const widthOfTheSlide = 100;
-  const standardOfDifference = 50;
-
-  // Вот эта херня нужна чтобы включать transition только при смене слайда
+  // to enable the transition only when changing the slide
   const [timer, setTimer] = useState(0);
   const [timerGo, setTimerGo] = useState(false);
 
   const id = useRef(0);
 
-  const TIMER_TIME = 1; // время transition в секундах
-
-  const clear = () => {
+  const stopTimer = () => {
     window.clearInterval(id.current);
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     id.current = window.setInterval(() => {
       setTimer((time) => time - 1);
     }, 1000);
-    return () => clear();
+    return () => stopTimer();
   }, [timerGo]);
 
-  // чтобы таймер не ушел в минус
-  React.useEffect(() => {
-    if (timer <= 0  || timerGo === false) {
-      clear();
+  // to prevent the timer from going into negative mode
+  useEffect(() => {
+    if (timer <= 0 || timerGo === false) {
+      stopTimer();
       setTimerGo(false);
     }
   }, [timer, timerGo]);
-  // Эта самая херня для transition до сюда
 
-
-  function goLeft() {
-    x < 0 &&
-    setX(x + widthOfTheSlide);
-    setOffsetX(0);
-    setTimerGo(true);
-    setTimer(timer + TIMER_TIME);
+  const goLeft = () => {
+    if (x < 0) {
+      setX(x + widthOfTheSlide);
+      setOffsetX(0);
+      setTimerGo(true);
+      setTimer(timer + TIMER_TIME);
+    }
   }
 
-  function goRight() {
-    x > -widthOfTheSlide * (SliderArr.length - 1) &&
-    setX(x - widthOfTheSlide);
-    setOffsetX(0);
-    setTimerGo(true);
-    setTimer(timer + TIMER_TIME);
+  const goRight = () => {
+    if (x > -widthOfTheSlide * (SliderArr.length - 1)) {
+      setX(x - widthOfTheSlide);
+      setOffsetX(0);
+      setTimerGo(true);
+      setTimer(timer + TIMER_TIME);
+    }
   }
 
-  // Переключение свайпами
+// swipe switching
   const handleStartMove = (event) => {
     if (event.type === 'mousedown') {
       setStartX(event.nativeEvent.clientX);
@@ -97,7 +96,7 @@ function Carousel() {
     }
   };
 
-  // переключение с клавиатуры
+// switching from the keyboard
   function swipeKeyboard(evt) {
     if (evt.key === 'ArrowRight') goRight();
     if (evt.key === 'ArrowLeft') goLeft();
@@ -139,7 +138,7 @@ function Carousel() {
             }
           )}
       </ul>
-      <div style={{marginTop: 20}}>{timer}</div>
+      <div style={{ marginTop: 20 }}>{timer}</div>
       <button className='button button-left' onClick={goLeft}>&larr;</button>
       <button className='button button-right' onClick={goRight}>&rarr;</button>
     </div>
