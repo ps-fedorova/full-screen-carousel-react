@@ -33,54 +33,59 @@ const Carousel = () => {
 
   // to prevent the timer from going into negative mode
   useEffect(() => {
-    if (timer <= 0 || timerGo === false) {
+    if (timer <= 0 || !timerGo) {
       stopTimer();
       setTimerGo(false);
     }
   }, [timer, timerGo]);
 
   const goLeft = () => {
-    if (x < 0) {
+    if (x < 0)
       setX(x + widthOfTheSlide);
       setOffsetX(0);
       setTimerGo(true);
       setTimer(timer + TIMER_TIME);
-    }
   }
 
   const goRight = () => {
-    if (x > -widthOfTheSlide * (SliderArr.length - 1)) {
+    if (x > -widthOfTheSlide * (SliderArr.length - 1))
       setX(x - widthOfTheSlide);
       setOffsetX(0);
       setTimerGo(true);
       setTimer(timer + TIMER_TIME);
-    }
   }
 
 // swipe switching
   const handleStartMove = (event) => {
-    if (event.type === 'mousedown') {
-      setStartX(event.nativeEvent.clientX);
-      setMouseDown(true);
-    } else if (event.type === 'touchstart') {
-      setStartX(event.touches[0].clientX);
+    const { type } = event;
+    switch(type) {
+      case 'mousedown':
+        setStartX(event.nativeEvent.clientX);
+        setMouseDown(true);
+        break;
+      case 'touchstart':
+        setStartX(event.touches[0].clientX);
+        break;
+      default:
+        // without it, the linter returns an error
     }
   };
 
   const handleMove = (event) => {
-    if (mouseDown === true && event.type === 'mousemove') {
+    if (event.type === 'mousemove' && mouseDown) {
       setOffsetX(event.clientX - startX);
-    } else if (event.changedTouches && event.type === 'touchmove') {
+    } else if (event.type === 'touchmove' && event.changedTouches) {
       setOffsetX(event.changedTouches[0].clientX - startX);
     }
   };
 
   const handleEndMove = (event) => {
     let difference = 0;
-    if (event.type === 'mouseup' && mouseDown === true) {
+
+    if (event.type === 'mouseup' && mouseDown) {
       difference = startX - event.clientX;
       setMouseDown(false);
-    } else if (event.type === 'mouseout' && mouseDown === true) {
+    } else if (event.type === 'mouseout' && mouseDown) {
       difference = startX - event.clientX;
       setMouseDown(false);
     } else if (event.type === 'touchend') {
